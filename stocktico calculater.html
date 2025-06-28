@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Position Size Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgb(234, 231, 236);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px #050505b2;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #3a5169 0%, #3498db 100%);
+            color: rgb(255, 255, 255);
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
+            transform: rotate(30deg);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e9ecef;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .card-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 42px;
+            color: #667eea;
+        }
+
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-danger:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.4);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .result-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e9ecef;
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 500;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .result-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .result-value.success {
+            color: #28a745;
+        }
+
+        .result-value.warning {
+            color: #ffc107;
+        }
+
+        .result-value.danger {
+            color: #dc3545;
+        }
+
+        .pyramid-section {
+            grid-column: 1 / -1;
+            margin-top: 20px;
+        }
+
+        .pyramid-entry {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e9ecef;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .pyramid-entry:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .pyramid-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .pyramid-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .pyramid-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .pyramid-inputs input {
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 0.95rem;
+        }
+
+        .pyramid-inputs input:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+        }
+
+        .pyramid-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .pyramid-result-item {
+            text-align: center;
+        }
+
+        .pyramid-result-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .pyramid-result-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #28a745;
+        }
+
+        .totals-section {
+            background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            border: 2px solid #28a745;
+        }
+
+        .totals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .total-item {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .total-item::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+
+        .total-label {
+            font-size: 1rem;
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .total-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #28a745;
+        }
+
+        .total-value.danger {
+            color: #dc3545;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-style: italic;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px dashed #e9ecef;
+        }
+
+        .pnl-section {
+            background: linear-gradient(135deg, #e6f7ff 0%, #f0faff 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            border: 2px solid #3498db;
+        }
+
+        .pnl-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .pnl-item {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pnl-item::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, #3498db, #1a5276);
+        }
+
+        .pnl-label {
+            font-size: 1rem;
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .pnl-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #3498db;
+        }
+
+        .pnl-value.success {
+            color: #28a745;
+        }
+
+        .pnl-value.danger {
+            color: #dc3545;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .risk-meter {
+            height: 12px;
+            background: #e9ecef;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .risk-meter-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .risk-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 500;
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+
+            <h1>Advanced Position Size Calculator</h1>
+            <p><h2>by vansh panchal <canvas></canvas></h2></p>
+            <p>pyramiding with PNL calculation and unlimited entries</h5></h5></p>
+    </div> 
+
+        <div class="main-grid">
+            <!-- Input Section -->
+            <div class="card">
+                <h2 class="card-title">Input Parameters</h2>
+
+                <div class="form-group">
+                    <label for="accountCapital">Account Capital (₹)</label>
+                    <input type="number" id="accountCapital" placeholder="1,00,000" min="1" step="1" value="100000">
+                    <i class="fas fa-rupee-sign input-icon"></i>
+                </div>
+
+                <div class="form-group">
+                    <label for="riskPercent">Risk % per Trade</label>
+                    <input type="number" id="riskPercent" placeholder="2.0" min="0.1" max="100" step="0.1" value="2">
+                    <i class="fas fa-percentage input-icon"></i>
+                </div>
+
+                <div class="form-group">
+                    <label for="entryPrice">Entry Price (₹)</label>
+                    <input type="number" id="entryPrice" placeholder="100.00" min="0.01" step="0.01" value="100">
+                    <i class="fas fa-tag input-icon"></i>
+                </div>
+
+                <div class="form-group">
+                    <label for="stopLoss">Stop Loss (₹)</label>
+                    <input type="number" id="stopLoss" placeholder="95.00" min="0.01" step="0.01" value="95">
+                    <i class="fas fa-ban input-icon"></i>
+                </div>
+
+                <div class="form-group">
+                    <label for="targetPrice">Target Price (₹) <small>(Optional)</small></label>
+                    <input type="number" id="targetPrice" placeholder="110.00" min="0.01" step="0.01" value="110">
+                    <i class="fas fa-bullseye input-icon"></i>
+                </div>
+
+                <button class="btn btn-primary" onclick="calculateMainPosition()">
+                    <i class="fas fa-calculator"></i> Calculate Main Position
+                </button>
+
+                <button class="btn btn-success" onclick="addPyramidEntry()">
+                    <i class="fas fa-plus-circle"></i> Add Pyramid Entry
+                </button>
+
+                <div id="alerts"></div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="card">
+                <h2 class="card-title">Main Position Results</h2>
+                <div id="mainResults">
+                    <div class="empty-state">
+                        <i class="fas fa-calculator fa-2x"></i>
+                        <p>Calculate your main position first</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pyramid Entries Section -->
+        <div class="pyramid-section">
+            <div class="card">
+                <h2 class="card-title">Pyramid Entries</h2>
+                <div id="pyramidEntries">
+                    <div class="empty-state">
+                        <i class="fas fa-layer-group fa-2x"></i>
+                        <p>No pyramid entries yet. Click "Add Pyramid Entry" to start.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Meter -->
+        <div class="card" id="riskMeter" style="display: none;">
+            <h2 class="card-title">Risk Allocation</h2>
+            <div class="risk-meter">
+                <div class="risk-meter-fill" id="riskMeterFill"></div>
+            </div>
+            <div class="risk-labels">
+                <span>0%</span>
+                <span>Risk Used: <span id="riskPercentUsed">0%</span></span>
+                <span>100%</span>
+            </div>
+        </div>
+
+        <!-- Totals Section -->
+        <div class="totals-section" id="totalsSection" style="display: none;">
+            <h2 class="card-title">Portfolio Summary</h2>
+            <div class="totals-grid" id="totalsGrid"></div>
+        </div>
+
+        <!-- PNL Section -->
+        <div class="pnl-section" id="pnlSection" style="display: none;">
+            <h2 class="card-title">Profit & Loss (PNL) Analysis</h2>
+            <div class="pnl-grid" id="pnlGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        let pyramidCounter = 0;
+        let mainPosition = null;
+        let pyramidEntries = [];
+        let accountCapital = 0;
+        let riskPercent = 0;
+        let maxRiskAmount = 0;
+
+        // Utility Functions
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                minimumFractionDigits: 2
+            }).format(amount);
+        }
+
+        function formatNumber(num) {
+            return new Intl.NumberFormat('en-IN').format(num);
+        }
+
+        function showAlert(message, type = 'danger') {
+            const alertsDiv = document.getElementById('alerts');
+            const alertId = 'alert-' + Date.now();
+
+            alertsDiv.innerHTML = `
+                <div class="alert alert-${type} fade-in" id="${alertId}">
+                    ${message}
+                </div>
+            `;
+
+            setTimeout(() => {
+                const alert = document.getElementById(alertId);
+                if (alert) alert.remove();
+            }, 5000);
+        }
+
+        function validateMainInputs() {
+            accountCapital = parseFloat(document.getElementById('accountCapital').value);
+            riskPercent = parseFloat(document.getElementById('riskPercent').value);
+            const entryPrice = parseFloat(document.getElementById('entryPrice').value);
+            const stopLoss = parseFloat(document.getElementById('stopLoss').value);
+            const targetPrice = parseFloat(document.getElementById('targetPrice').value) || null;
+
+            if (!accountCapital || !riskPercent || !entryPrice || !stopLoss) {
+                showAlert('Please fill in all required fields.');
+                return null;
+            }
+
+            if (accountCapital <= 0) {
+                showAlert('Account capital must be positive.');
+                return null;
+            }
+
+            if (riskPercent <= 0 || riskPercent > 100) {
+                showAlert('Risk percentage must be between 0.1% and 100%.');
+                return null;
+            }
+
+            if (entryPrice <= stopLoss) {
+                showAlert('Entry price must be greater than stop loss.');
+                return null;
+            }
+
+            if (targetPrice && targetPrice <= entryPrice) {
+                showAlert('Target price must be greater than entry price for long positions.');
+                return null;
+            }
+
+            return { accountCapital, riskPercent, entryPrice, stopLoss, targetPrice };
+        }
+
+        function calculateMainPosition() {
+            const inputs = validateMainInputs();
+            if (!inputs) return;
+
+            const { accountCapital, riskPercent, entryPrice, stopLoss, targetPrice } = inputs;
+
+            maxRiskAmount = (accountCapital * riskPercent) / 100;
+            const riskPerShare = entryPrice - stopLoss;
+            const quantity = Math.floor(maxRiskAmount / riskPerShare);
+            const positionSize = quantity * entryPrice;
+            const actualRisk = quantity * riskPerShare;
+            const potentialProfit = targetPrice ? (targetPrice - entryPrice) * quantity : null;
+
+            mainPosition = {
+                quantity,
+                positionSize,
+                riskPerShare,
+                actualRisk,
+                entryPrice,
+                stopLoss,
+                targetPrice,
+                potentialProfit
+            };
+
+            displayMainResults();
+            updateTotals();
+            updatePNL();
+            updateRiskMeter();
+            showAlert('Main position calculated successfully!', 'success');
+        }
+
+        function displayMainResults() {
+            const resultsDiv = document.getElementById('mainResults');
+            let profitHtml = '';
+
+            if (mainPosition.potentialProfit !== null) {
+                profitHtml = `
+                    <div class="result-item">
+                        <div class="result-label">Potential Profit</div>
+                        <div class="result-value ${mainPosition.potentialProfit >= 0 ? 'success' : 'danger'}">
+                            ${formatCurrency(mainPosition.potentialProfit)}
+                        </div>
+                    </div>
+                `;
+            }
+
+            resultsDiv.innerHTML = `
+                <div class="results-grid">
+                    <div class="result-item">
+                        <div class="result-label">Quantity</div>
+                        <div class="result-value">${formatNumber(mainPosition.quantity)}</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Position Size</div>
+                        <div class="result-value">${formatCurrency(mainPosition.positionSize)}</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Risk per Share</div>
+                        <div class="result-value">${formatCurrency(mainPosition.riskPerShare)}</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Total Risk</div>
+                        <div class="result-value">${formatCurrency(mainPosition.actualRisk)}</div>
+                    </div>
+                    ${profitHtml}
+                </div>
+            `;
+        }
+
+        function addPyramidEntry() {
+            if (!mainPosition) {
+                showAlert('Please calculate the main position first.');
+                return;
+            }
+
+            pyramidCounter++;
+            const entryId = `pyramid-${pyramidCounter}`;
+
+            const pyramidDiv = document.getElementById('pyramidEntries');
+            if (pyramidDiv.querySelector('.empty-state')) {
+                pyramidDiv.innerHTML = '';
+            }
+
+            const entryHtml = `
+                <div class="pyramid-entry fade-in" id="${entryId}">
+                    <div class="pyramid-header">
+                        <h3 class="pyramid-title">Pyramid Entry #${pyramidCounter}</h3>
+                        <button class="btn btn-danger" onclick="removePyramidEntry('${entryId}', ${pyramidCounter})">
+                            ✕
+                        </button>
+                    </div>
+                    
+                    <div class="pyramid-inputs">
+                        <div class="form-group">
+                            <label>Entry Price (₹)</label>
+                            <input type="number" id="entry-${pyramidCounter}" placeholder="105.00" min="0.01" step="0.01" value="105">
+                        </div>
+                        <div class="form-group">
+                            <label>Stop Loss (₹)</label>
+                            <input type="number" id="stop-${pyramidCounter}" placeholder="100.00" min="0.01" step="0.01" value="100">
+                        </div>
+                        <div class="form-group">
+                            <label>Target Price (₹) <small>(Optional)</small></label>
+                            <input type="number" id="target-${pyramidCounter}" placeholder="110.00" min="0.01" step="0.01" value="110">
+                        </div>
+                        <div class="form-group">
+                            <label>Quantity (Optional)</label>
+                            <input type="number" id="qty-${pyramidCounter}" placeholder="Auto calculate">
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-primary" onclick="calculatePyramidEntry(${pyramidCounter})">
+                                <i class="fas fa-calculator"></i> Calculate
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="results-${pyramidCounter}"></div>
+                </div>
+            `;
+
+            pyramidDiv.insertAdjacentHTML('beforeend', entryHtml);
+        }
+
+        function calculatePyramidEntry(id) {
+            const entryPrice = parseFloat(document.getElementById(`entry-${id}`).value);
+            const stopLoss = parseFloat(document.getElementById(`stop-${id}`).value);
+            const targetPrice = parseFloat(document.getElementById(`target-${id}`).value) || null;
+            const quantityInput = document.getElementById(`qty-${id}`).value;
+            const quantity = quantityInput ? parseFloat(quantityInput) : null;
+
+            if (!entryPrice || !stopLoss) {
+                showAlert(`Please enter both entry price and stop loss for Pyramid #${id}.`);
+                return;
+            }
+
+            if (entryPrice <= stopLoss) {
+                showAlert(`Entry price must be greater than stop loss for Pyramid #${id}.`);
+                return;
+            }
+
+            if (targetPrice && targetPrice <= entryPrice) {
+                showAlert(`Target price must be greater than entry price for Pyramid #${id}.`);
+                return;
+            }
+
+            const riskPerShare = entryPrice - stopLoss;
+            const usedRisk = getTotalRiskUsed();
+            const remainingRisk = maxRiskAmount - usedRisk;
+
+            let calculatedQty;
+            if (quantity && quantity > 0) {
+                calculatedQty = quantity;
+            } else {
+                calculatedQty = Math.floor(remainingRisk / riskPerShare);
+            }
+
+            const positionSize = calculatedQty * entryPrice;
+            const riskForEntry = calculatedQty * riskPerShare;
+            const potentialProfit = targetPrice ? (targetPrice - entryPrice) * calculatedQty : null;
+
+            if (riskForEntry > remainingRisk) {
+                showAlert(`Pyramid #${id} exceeds remaining risk capacity of ${formatCurrency(remainingRisk)}.`);
+                return;
+            }
+
+            if (calculatedQty <= 0) {
+                showAlert(`Insufficient remaining risk for Pyramid #${id}.`);
+                return;
+            }
+
+            // Remove existing entry if it exists
+            const existingIndex = pyramidEntries.findIndex(entry => entry.id === id);
+            if (existingIndex !== -1) {
+                pyramidEntries.splice(existingIndex, 1);
+            }
+
+            // Add new entry
+            pyramidEntries.push({
+                id,
+                quantity: calculatedQty,
+                positionSize,
+                riskPerShare,
+                actualRisk: riskForEntry,
+                entryPrice,
+                stopLoss,
+                targetPrice,
+                potentialProfit
+            });
+
+            displayPyramidResults(id, {
+                quantity: calculatedQty,
+                positionSize,
+                riskPerShare,
+                actualRisk: riskForEntry,
+                potentialProfit
+            });
+
+            updateTotals();
+            updatePNL();
+            updateRiskMeter();
+            showAlert(`Pyramid #${id} calculated successfully!`, 'success');
+        }
+
+        function displayPyramidResults(id, results) {
+            let profitHtml = '';
+            if (results.potentialProfit !== null) {
+                profitHtml = `
+                    <div class="pyramid-result-item">
+                        <div class="pyramid-result-label">Profit</div>
+                        <div class="pyramid-result-value ${results.potentialProfit >= 0 ? 'success' : 'danger'}">
+                            ${formatCurrency(results.potentialProfit)}
+                        </div>
+                    </div>
+                `;
+            }
+
+            const resultsDiv = document.getElementById(`results-${id}`);
+            resultsDiv.innerHTML = `
+                <div class="pyramid-results">
+                    <div class="pyramid-result-item">
+                        <div class="pyramid-result-label">Quantity</div>
+                        <div class="pyramid-result-value">${formatNumber(results.quantity)}</div>
+                    </div>
+                    <div class="pyramid-result-item">
+                        <div class="pyramid-result-label">Position Size</div>
+                        <div class="pyramid-result-value">${formatCurrency(results.positionSize)}</div>
+                    </div>
+                    <div class="pyramid-result-item">
+                        <div class="pyramid-result-label">Risk</div>
+                        <div class="pyramid-result-value">${formatCurrency(results.actualRisk)}</div>
+                    </div>
+                    ${profitHtml}
+                </div>
+            `;
+        }
+
+        function removePyramidEntry(entryId, id) {
+            const entryDiv = document.getElementById(entryId);
+            if (entryDiv) {
+                entryDiv.remove();
+            }
+
+            // Remove from pyramidEntries array
+            const index = pyramidEntries.findIndex(entry => entry.id === id);
+            if (index !== -1) {
+                pyramidEntries.splice(index, 1);
+            }
+
+            // Check if no entries left
+            const pyramidDiv = document.getElementById('pyramidEntries');
+            if (pyramidDiv.children.length === 0) {
+                pyramidDiv.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-layer-group fa-2x"></i>
+                        <p>No pyramid entries yet. Click "Add Pyramid Entry" to start.</p>
+                    </div>
+                `;
+            }
+
+            updateTotals();
+            updatePNL();
+            updateRiskMeter();
+            showAlert(`Pyramid #${id} removed successfully.`, 'warning');
+        }
+
+        function getTotalRiskUsed() {
+            let totalRisk = 0;
+            if (mainPosition) {
+                totalRisk += mainPosition.actualRisk;
+            }
+            pyramidEntries.forEach(entry => {
+                totalRisk += entry.actualRisk;
+            });
+            return totalRisk;
+        }
+
+        function getTotalQuantity() {
+            let totalQty = 0;
+            if (mainPosition) {
+                totalQty += mainPosition.quantity;
+            }
+            pyramidEntries.forEach(entry => {
+                totalQty += entry.quantity;
+            });
+            return totalQty;
+        }
+
+        function getTotalPositionSize() {
+            let totalSize = 0;
+            if (mainPosition) {
+                totalSize += mainPosition.positionSize;
+            }
+            pyramidEntries.forEach(entry => {
+                totalSize += entry.positionSize;
+            });
+            return totalSize;
+        }
+
+        function getTotalPotentialProfit() {
+            let totalProfit = 0;
+            if (mainPosition && mainPosition.potentialProfit !== null) {
+                totalProfit += mainPosition.potentialProfit;
+            }
+            pyramidEntries.forEach(entry => {
+                if (entry.potentialProfit !== null) {
+                    totalProfit += entry.potentialProfit;
+                }
+            });
+            return totalProfit;
+        }
+
+        function getAverageEntryPrice() {
+            const totalQuantity = getTotalQuantity();
+            if (totalQuantity === 0) return 0;
+
+            let totalValue = 0;
+            if (mainPosition) {
+                totalValue += mainPosition.entryPrice * mainPosition.quantity;
+            }
+            pyramidEntries.forEach(entry => {
+                totalValue += entry.entryPrice * entry.quantity;
+            });
+
+            return totalValue / totalQuantity;
+        }
+
+        function updateTotals() {
+            if (!mainPosition) {
+                document.getElementById('totalsSection').style.display = 'none';
+                return;
+            }
+
+            const totalQty = getTotalQuantity();
+            const totalSize = getTotalPositionSize();
+            const totalRisk = getTotalRiskUsed();
+            const remainingRisk = maxRiskAmount - totalRisk;
+            const riskPercentUsed = (totalRisk / maxRiskAmount) * 100;
+
+            document.getElementById('totalsSection').style.display = 'block';
+            document.getElementById('totalsGrid').innerHTML = `
+                <div class="total-item">
+                    <div class="total-label">Total Quantity</div>
+                    <div class="total-value">${formatNumber(totalQty)}</div>
+                </div>
+                <div class="total-item">
+                    <div class="total-label">Total Position Size</div>
+                    <div class="total-value">${formatCurrency(totalSize)}</div>
+                </div>
+                <div class="total-item">
+                    <div class="total-label">Total Risk Used</div>
+                    <div class="total-value">${formatCurrency(totalRisk)}</div>
+                </div>
+                <div class="total-item">
+                    <div class="total-label">Remaining Risk</div>
+                    <div class="total-value ${remainingRisk < 0 ? 'danger' : 'success'}">${formatCurrency(remainingRisk)}</div>
+                </div>
+                <div class="total-item">
+                    <div class="total-label">Risk % Used</div>
+                    <div class="total-value">${riskPercentUsed.toFixed(2)}%</div>
+                </div>
+            `;
+        }
+
+        function updatePNL() {
+            if (!mainPosition) {
+                document.getElementById('pnlSection').style.display = 'none';
+                return;
+            }
+
+            const totalProfit = getTotalPotentialProfit();
+            const totalSize = getTotalPositionSize();
+            const roi = totalSize > 0 ? (totalProfit / totalSize) * 100 : 0;
+            const avgEntry = getAverageEntryPrice();
+            const totalQty = getTotalQuantity();
+
+            document.getElementById('pnlSection').style.display = 'block';
+            document.getElementById('pnlGrid').innerHTML = `
+                <div class="pnl-item">
+                    <div class="pnl-label">Total Potential Profit</div>
+                    <div class="pnl-value ${totalProfit >= 0 ? 'success' : 'danger'}">${formatCurrency(totalProfit)}</div>
+                </div>
+                <div class="pnl-item">
+                    <div class="pnl-label">Return on Investment</div>
+                    <div class="pnl-value ${roi >= 0 ? 'success' : 'danger'}">${roi.toFixed(2)}%</div>
+                </div>
+                <div class="pnl-item">
+                    <div class="pnl-label">Average Entry Price</div>
+                    <div class="pnl-value">${formatCurrency(avgEntry)}</div>
+                </div>
+                <div class="pnl-item">
+                    <div class="pnl-label">Total Shares</div>
+                    <div class="pnl-value">${formatNumber(totalQty)}</div>
+                </div>
+            `;
+        }
+
+        function updateRiskMeter() {
+            if (!mainPosition) {
+                document.getElementById('riskMeter').style.display = 'none';
+                return;
+            }
+
+            const totalRisk = getTotalRiskUsed();
+            const riskPercentUsed = (totalRisk / maxRiskAmount) * 100;
+
+            document.getElementById('riskMeter').style.display = 'block';
+            document.getElementById('riskMeterFill').style.width = `${Math.min(100, riskPercentUsed)}%`;
+            document.getElementById('riskPercentUsed').textContent = `${riskPercentUsed.toFixed(2)}%`;
+        }
+
+        // Input validation
+        document.addEventListener('DOMContentLoaded', function () {
+            const numberInputs = document.querySelectorAll('input[type="number"]');
+            numberInputs.forEach(input => {
+                input.addEventListener('input', function () {
+                    if (this.value < 0) {
+                        this.value = '';
+                    }
+                });
+            });
+
+            // Initialize with sample data
+            calculateMainPosition();
+            setTimeout(() => {
+                addPyramidEntry();
+                setTimeout(() => {
+                    document.querySelectorAll('.pyramid-entry').forEach(el => {
+                        const id = parseInt(el.id.split('-')[1]);
+                        calculatePyramidEntry(id);
+                    });
+                }, 500);
+            }, 500);
+        });
+    </script>
+</body>
+
+</html>
