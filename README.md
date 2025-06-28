@@ -1,0 +1,1 @@
+# stocktico-calculator
